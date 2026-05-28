@@ -1,0 +1,4 @@
+*.o
+*.exe
+uno
+.DS_Store
