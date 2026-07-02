@@ -14,16 +14,19 @@ void game_setup(GameState *game) {
     game->players[0].hand_card_count = 0;
 
     strcpy(game->players[1].player_name, "Bot 1");
-    game->players[1].player_type = EASY_BOT;
+    game->players[1].player_type = BOT;
     game->players[1].hand_card_count = 0;
+    game->players[1].intelligence = 0;
 
     strcpy(game->players[2].player_name, "Bot 2");
-    game->players[2].player_type = EASY_BOT;
+    game->players[2].player_type = BOT;
     game->players[2].hand_card_count = 0;
+    game->players[2].intelligence = 50;
 
     strcpy(game->players[3].player_name, "Bot 3");
-    game->players[3].player_type = EASY_BOT;
+    game->players[3].player_type = BOT;
     game->players[3].hand_card_count = 0;
+    game->players[3].intelligence = 100;
 
     for(int player = 0; player < 4; player++){
         for(int i = 0; i < 7; i++) {

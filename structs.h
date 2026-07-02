@@ -24,8 +24,12 @@ typedef enum CardType {
  * Enum che descrive il tipo del giocatore, che può essere un umano (player) o bot.
  */
 typedef enum PlayerType {
-    PLAYER, EASY_BOT, NORMAL_BOT
+    PLAYER, BOT
 } PlayerType;
+
+typedef enum BotState {
+    BOT_STATE_CLUELESS, BOT_STATE_STANDARD, BOT_STATE_AGGRESSIVE, BOT_STATE_PANIC, BOT_STATE_WIN_CHASE
+} BotState;
 
 /*
  * Struttura della singola carta, che possiede un colore e un tipo.
@@ -53,6 +57,8 @@ typedef struct Player {
     Card hand[DECK];
     int hand_card_count;
     PlayerType player_type;
+    int intelligence;
+    BotState bot_state;
 } Player;
 
 /*
