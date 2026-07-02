@@ -189,6 +189,7 @@ static int bot_logic(GameState *game, int bot_index) {
     }
 
 
+    int chosen_move = -1;
     switch(bot->bot_state) {
 
         case BOT_STATE_WIN_CHASE: {
@@ -203,207 +204,177 @@ static int bot_logic(GameState *game, int bot_index) {
                 }
 
                 if(wild_card_index != -1) {
-                    free(valid_attack_move_indexes);
-                    free(valid_neutral_move_indexes);
-
-                    return wild_card_index;
+                    chosen_move = wild_card_index;
+                    break;
                 }
+
 
             }
 
-            int defense_card_index = 0;
+            if (chosen_move != -1) break;
+
             for(int i = 0; i < valid_attack_moves_count; i++) {
                 if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE
                     || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO) {
-                    defense_card_index = valid_attack_move_indexes[i];
-                    free(valid_neutral_move_indexes);
-                    free(valid_attack_move_indexes);
-                    return defense_card_index;
+                    chosen_move = valid_attack_move_indexes[i];
+                    break;
                 }
             }
 
+            if (chosen_move != -1) break;
+
             if(valid_neutral_moves_count > 0) {
-                int second_to_last_card_index = valid_neutral_move_indexes[0];
-                free(valid_neutral_move_indexes);
-                free(valid_attack_move_indexes);
-                return second_to_last_card_index;
+                chosen_move = valid_neutral_move_indexes[0];
+                break;
             }
 
-            free(valid_attack_move_indexes);
-            free(valid_neutral_move_indexes);
-            return -1;
 
             break;
         }
 
         case BOT_STATE_AGGRESSIVE: {
-            int move = -1;
 
             if(valid_attack_moves_count > 0) {
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD_DRAW_FOUR) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
+
+                if (chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
+
+                if (chosen_move != -1) break;
 
                 if(previous_player.hand_card_count > 2) {
                     for(int i = 0; i < valid_attack_moves_count; i++) {
 
                         if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE) {
-                            move = valid_attack_move_indexes[i];
-                            free(valid_neutral_move_indexes);
-                            free(valid_attack_move_indexes);
-                            return move;
+                            chosen_move = valid_attack_move_indexes[i];
+                            break;
                         }
                     }
                 }
 
+                if (chosen_move != -1) break;
+
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].color == COLOR_WILD) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
+
+                if (chosen_move != -1) break;
 
             }
 
             if(valid_neutral_moves_count > 0) {
-                move = valid_neutral_move_indexes[0];
-                free(valid_neutral_move_indexes);
-                free(valid_attack_move_indexes);
-                return move;
+                chosen_move = valid_neutral_move_indexes[0];
+                break;
             }
-
-            free(valid_attack_move_indexes);
-            free(valid_neutral_move_indexes);
-            return -1;
 
             break;
         }
 
         case BOT_STATE_PANIC: {
-            int move = -1;
-
             if(valid_attack_moves_count > 0) {
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD_DRAW_FOUR) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
+
+                if (chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].color == COLOR_WILD) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
+
+                if (chosen_move != -1) break;
 
                 if(previous_player.hand_card_count > 2) {
                     for(int i = 0; i < valid_attack_moves_count; i++) {
 
                         if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE) {
-                            move = valid_attack_move_indexes[i];
-                            free(valid_neutral_move_indexes);
-                            free(valid_attack_move_indexes);
-                            return move;
+                            chosen_move = valid_attack_move_indexes[i];
+                            break;
                         }
                     }
                 }
             }
 
+            if (chosen_move != -1) break;
+
             if(valid_neutral_moves_count > 0) {
-                move = valid_neutral_move_indexes[0];
-                free(valid_neutral_move_indexes);
-                free(valid_attack_move_indexes);
-                return move;
+                chosen_move = valid_neutral_move_indexes[0];
+                break;
             }
+
+            if (chosen_move != -1) break;
 
             if(valid_attack_moves_count > 0) {
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
             }
-
-            free(valid_attack_move_indexes);
-            free(valid_neutral_move_indexes);
-            return -1;
-
             break;
         }
 
         case BOT_STATE_STANDARD: {
-            int move = -1;
-
             if(valid_neutral_moves_count > 0) {
-                move = valid_neutral_move_indexes[0];
-                free(valid_neutral_move_indexes);
-                free(valid_attack_move_indexes);
-                return move;
+                chosen_move = valid_neutral_move_indexes[0];
+                break;
             }
+
+            if (chosen_move != -1) break;
 
             if(valid_attack_moves_count > 0) {
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO
                         || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
+
+                if (chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
 
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD_DRAW_FOUR) {
-                        move = valid_attack_move_indexes[i];
-                        free(valid_neutral_move_indexes);
-                        free(valid_attack_move_indexes);
-                        return move;
+                        chosen_move = valid_attack_move_indexes[i];
+                        break;
                     }
                 }
             }
-
-            free(valid_attack_move_indexes);
-            free(valid_neutral_move_indexes);
-            return -1;
-
             break;
         }
     }
 
     free(valid_attack_move_indexes);
     free(valid_neutral_move_indexes);
-    return -1;
+    return chosen_move;
 }

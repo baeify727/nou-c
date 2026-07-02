@@ -1,6 +1,7 @@
 #include "game.h"
 #include "deck.h"
 #include "structs.h"
+#include "turn.h"
 #include <string.h>
 
 void game_setup(GameState *game) {
@@ -35,14 +36,26 @@ void game_setup(GameState *game) {
         }
     }
 
-    game->discard_pile[0] = draw_card(game->draw_pile, &game->cards_remaining);
+    game->current_turn = 0;
+    game->game_orientation = true;
+    game->penalties = 0;
+
+    do {
+        game->discard_pile[0] = draw_card(game->draw_pile, &game->cards_remaining);
+        if (game->discard_pile[0].color == COLOR_WILD) {
+            game->draw_pile[game->cards_remaining] = game->discard_pile[0];
+            game->cards_remaining++;
+        }
+    } while (game->discard_pile[0].color == COLOR_WILD);
+
     game->discarded_cards = 1;
 
-    game->current_turn = 0;
+    if(game->discard_pile[0].card_type == CARD_DRAW_TWO ||
+        game->discard_pile[0].card_type == CARD_SKIP ||
+        game->discard_pile[0].card_type == CARD_REVERSE) {
 
-    game->game_orientation = true;
-
-    game->penalties = 0;
+            apply_card_effect(game, game->discard_pile[0]);
+        }
 
 }
 
