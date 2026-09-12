@@ -6,6 +6,8 @@ Implementazione modulare in C del gioco di carte UNO, sviluppata con interfaccia
 
 ## Panoramica
 
+![Preview della finestra di gioco](./nou_game.png)
+
 Il progetto replica le meccaniche del gioco da tavolo ufficiale integrando:
 - Gestione completa del mazzo con rimescolamento automatico degli scarti ad esaurimento.
 - Supporto alle carte azione e speciali: Salto turno, Inversione, +2, Cambio colore (Wild) e +4 (Wild Draw Four).
@@ -42,8 +44,8 @@ Installa i pacchetti necessari tramite `pacman`, clona la repository e compila:
 sudo pacman -S gcc ncurses cjson git
 
 # 2. Clona la repository
-git clone https://github.com/baeify727/uno-c-project.git
-cd uno-c-project
+git clone https://github.com/baeify727/nou-c
+cd nou-c
 
 # 3. Compila il progetto
 gcc main.c game.c deck.c turn.c bot.c storage.c ui.c -lncurses -lcjson -o nou
@@ -62,8 +64,8 @@ sudo apt update
 sudo apt install build-essential libncurses5-dev libncursesw5-dev libcjson-dev git
 
 # 2. Clona la repository
-git clone https://github.com/baeify727/uno-c-project.git
-cd uno-c-project
+git clone https://github.com/baeify727/nou-c
+cd nou-c
 
 # 3. Compila il progetto
 gcc main.c game.c deck.c turn.c bot.c storage.c ui.c -lncurses -lcjson -o nou
@@ -74,13 +76,38 @@ gcc main.c game.c deck.c turn.c bot.c storage.c ui.c -lncurses -lcjson -o nou
 
 ### 3. Windows 11
 
+**NOTA: Il main menu del gioco potrebbe risultare corrotto a causa di caratteri che non sono supportati dal terminale di windows. Il gioco funziona lo stesso nonostante questo problema.**
+
 Dato che il gioco utilizza `ncurses` (progettata per terminali Unix), il metodo più rapido e stabile per eseguire l'applicazione su Windows 11 è tramite **WSL** (Windows Subsystem for Linux).
 
-Apri **PowerShell** come amministratore ed esegui il comando per installare WSL (installerà Ubuntu di default):
+Apri **PowerShell** come amministratore ed esegui il comando per installare WSL:
 ```powershell
 wsl --install
 ```
+Riavvia il computer. Poi apri nuovamente PowerShell e installa Ubuntu:
+```powershell
+wsl.exe --install Ubuntu
+```
+al termine dell'installazione, il terminale chiederà di inserire un nome utente e una password.
 
+Una volta forniti nome utente e password, è possibile aprire Ubuntu tramite il menù Start di Windows.
 
-Riavvia il computer se richiesto, poi apri il terminale **Ubuntu** dal menù Start.
-All'interno del terminale Ubuntu, esegui gli stessi comandi previsti per le distribuzioni Debian/Ubuntu (segui il punto 2).
+Adesso bisogna spostarsi all'interno della cartella dove si è clonata la repository:
+(esempio)
+```bash
+ cd /mnt/c/Users/[nomeutente]/Downloads/nou-c
+```
+nota: il percorso deve essere sempre avere /mnt/ come prefisso.
+
+Esegui questi comandi:
+```bash
+# 1. Installa le dipendenze
+sudo apt update
+sudo apt install build-essential libncurses5-dev libncursesw5-dev libcjson-dev
+
+# 2. Compila il progetto
+gcc main.c game.c deck.c turn.c bot.c storage.c ui.c -lncurses -lcjson -o nou
+
+# 3. Esegui il gioco
+./nou
+```
