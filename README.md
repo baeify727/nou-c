@@ -24,9 +24,10 @@ Il codice sorgente è organizzato secondo una struttura strettamente modulare:
 * **Game Logic** (`game.h`, `game.c`): Setup del tavolo, distribuzione iniziale, validazione delle mosse legali e gestione del mazzo di pesca.
 * **Turn Engine** (`turn.h`, `turn.c`): Rotazione oraria/antioraria dei turni, risoluzione degli effetti delle carte speciali e applicazione delle penalità di accumulo.
 * **Bot AI** (`bot.h`, `bot.c`): Logica di decisione mossa per i bot, selezione del colore ottimale per le carte jolly e gestione probabilistica del callout.
-* **Storage** (`storage.h`, `storage.c`): Serializzazione e deserializzazione JSON per lo stato di gioco (`uno_save.json`) e il profilo giocatore (`uno_profile.json`).
+* **Storage** (`storage.h`, `storage.c`): Serializzazione e deserializzazione JSON per lo stato di gioco (`nou_save.json`) e il profilo giocatore (`nou_profile.json`).
 * **TUI** (`ui.h`, `ui.c`): Rendering a schermo intero con colori ncurses, finestre informative, menu interattivi e log eventi.
 * **Entry Point** (`main.c`): Game loop, gestione degli input utente asincroni e verifica condizioni di vittoria.
+
 ---
 
 ## Dipendenze
