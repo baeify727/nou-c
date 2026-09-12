@@ -27,13 +27,60 @@ Il codice sorgente è organizzato secondo una struttura strettamente modulare:
 * **Storage** (`storage.h`, `storage.c`): Serializzazione e deserializzazione JSON per lo stato di gioco (`nou_save.json`) e il profilo giocatore (`nou_profile.json`).
 * **TUI** (`ui.h`, `ui.c`): Rendering a schermo intero con colori ncurses, finestre informative, menu interattivi e log eventi.
 * **Entry Point** (`main.c`): Game loop, gestione degli input utente asincroni e verifica condizioni di vittoria.
-
 ---
 
-## Dipendenze
+## Compilazione ed Esecuzione
 
-Per la compilazione del progetto sono necessari i seguenti pacchetti:
+Per compilare ed eseguire **NOU**, è necessario avere un compilatore C (come GCC) e le librerie `ncurses` e `cJSON` installate nel sistema. Di seguito le istruzioni per i principali sistemi operativi.
 
-- Compilatore C standard compatibile C99/C11 (`gcc` o `clang`)
-- Libreria **ncurses**
-- Libreria **cJSON**
+### 1. Arch Linux
+
+Installa i pacchetti necessari tramite `pacman`, clona la repository e compila:
+
+```bash
+# 1. Installa le dipendenze
+sudo pacman -S gcc ncurses cjson git
+
+# 2. Clona la repository
+git clone https://github.com/baeify727/uno-c-project.git
+cd uno-c-project
+
+# 3. Compila il progetto
+gcc main.c game.c deck.c turn.c bot.c storage.c ui.c -lncurses -lcjson -o nou
+
+# 4. Esegui il gioco
+./nou
+```
+
+### 2. Ubuntu / Debian / Linux Mint
+
+I nomi dei pacchetti di sviluppo su distribuzioni basate su Debian differiscono leggermente:
+
+```bash
+# 1. Installa le dipendenze
+sudo apt update
+sudo apt install build-essential libncurses5-dev libncursesw5-dev libcjson-dev git
+
+# 2. Clona la repository
+git clone https://github.com/baeify727/uno-c-project.git
+cd uno-c-project
+
+# 3. Compila il progetto
+gcc main.c game.c deck.c turn.c bot.c storage.c ui.c -lncurses -lcjson -o nou
+
+# 4. Esegui il gioco
+./nou
+```
+
+### 3. Windows 11
+
+Dato che il gioco utilizza `ncurses` (progettata per terminali Unix), il metodo più rapido e stabile per eseguire l'applicazione su Windows 11 è tramite **WSL** (Windows Subsystem for Linux).
+
+Apri **PowerShell** come amministratore ed esegui il comando per installare WSL (installerà Ubuntu di default):
+```powershell
+wsl --install
+```
+
+
+Riavvia il computer se richiesto, poi apri il terminale **Ubuntu** dal menù Start.
+All'interno del terminale Ubuntu, esegui gli stessi comandi previsti per le distribuzioni Debian/Ubuntu (segui il punto 2).
