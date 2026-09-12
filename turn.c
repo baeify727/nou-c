@@ -1,5 +1,8 @@
 #include "turn.h"
 #include "structs.h"
+#include "game.h"
+#include "ui.h"
+#include <stdio.h>
 
 void next_turn(GameState *game) {
     if(game->game_orientation == true) {
@@ -29,5 +32,20 @@ void apply_card_effect(GameState *game, Card played_card) {
             break;
         default:
             break;
+    }
+}
+
+void apply_penalties_if_any(GameState *game, int player_index) {
+    if(game->penalties > 0) {
+        char msg[32];
+        snprintf(msg, sizeof(msg), "%s pesca +%d e salta",
+                 game->players[player_index].player_name, game->penalties);
+        ui_add_log(msg);
+
+        for(int i = 0; i < game->penalties; i++) {
+            draw_from_pile(game, player_index);
+        }
+        game->penalties = 0;
+        next_turn(game);
     }
 }

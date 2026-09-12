@@ -1,12 +1,11 @@
 #include "deck.h"
 #include "structs.h"
 #include <stdlib.h>
-#include <time.h>
 
 void initialize_deck(Card draw_pile[], int *cards_remaining) {
     int count = 0;
 
-    for(Color color = COLOR_RED; color < COLOR_WILD; color++) {
+    for(Color color = GAME_COLOR_RED; color < GAME_COLOR_WILD; color++) {
         draw_pile[count].color = color;
         draw_pile[count].card_type = CARD_ZERO;
         count++;
@@ -21,7 +20,7 @@ void initialize_deck(Card draw_pile[], int *cards_remaining) {
 
     for(CardType type = CARD_WILD; type <= CARD_WILD_DRAW_FOUR; type++) {
         for(int j = 0; j < 4; j++) {
-            draw_pile[count].color = COLOR_WILD;
+            draw_pile[count].color = GAME_COLOR_WILD;
             draw_pile[count].card_type = type;
             count++;
         }

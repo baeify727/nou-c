@@ -2,7 +2,6 @@
 #include "structs.h"
 #include "game.h"
 #include <stdlib.h>
-#include <time.h>
 #include <stdio.h>
 
 static int bot_logic(GameState *game, int bot_index);
@@ -18,7 +17,6 @@ int bot_choose_move(GameState *game, int bot_index) {
     }
 
     return bot_logic(game, bot_index);
-
 }
 
 Color bot_choose_wild_card_color(GameState *game, int bot_index) {
@@ -30,12 +28,12 @@ Color bot_choose_wild_card_color(GameState *game, int bot_index) {
 
     int color_count[4] = {0};
     for(int card_index = 0; card_index < bot->hand_card_count; card_index++) {
-        if(bot->hand[card_index].color < COLOR_WILD) {
+        if(bot->hand[card_index].color < GAME_COLOR_WILD) {
             color_count[bot->hand[card_index].color]++;
         }
     }
 
-    Color highest_color_count = COLOR_RED;
+    Color highest_color_count = GAME_COLOR_RED;
     int max_count = color_count[0];
     for(int i = 1; i < 4; i++) {
         if(color_count[i] > max_count) {
@@ -45,20 +43,19 @@ Color bot_choose_wild_card_color(GameState *game, int bot_index) {
     }
 
     return highest_color_count;
-
 }
 
 static bool has_wild_card(GameState *game, int bot_index) {
-    bool has_wild_card = false;
+    bool has_wild = false;
     Player *bot = &game->players[bot_index];
 
     for(int card_index = 0; card_index < bot->hand_card_count; card_index++) {
-        if(bot->hand[card_index].color == COLOR_WILD) {
-            has_wild_card = true;
+        if(bot->hand[card_index].color == GAME_COLOR_WILD) {
+            has_wild = true;
         }
     }
 
-    return has_wild_card;
+    return has_wild;
 }
 
 static int bot_logic(GameState *game, int bot_index) {
@@ -78,7 +75,7 @@ static int bot_logic(GameState *game, int bot_index) {
     if(game->game_orientation == true) {
         next_turn_index = (game->current_turn + 1) % game->player_count;
     } else {
-        if(game->current_turn > 0){
+        if(game->current_turn > 0) {
             next_turn_index = (game->current_turn - 1);
         } else {
             next_turn_index = game->player_count - 1;
@@ -91,13 +88,12 @@ static int bot_logic(GameState *game, int bot_index) {
         if(game->current_turn > 0) {
             previous_turn_index = (game->current_turn - 1);
         } else {
-            previous_turn_index = (game->player_count - 1);
+            previous_turn_index = game->player_count - 1;
         }
     } else {
         previous_turn_index = (game->current_turn + 1) % game->player_count;
     }
     Player previous_player = game->players[previous_turn_index];
-
 
     int lowest_card_count = 999;
     int dangerous_player_index = -1;
@@ -117,61 +113,48 @@ static int bot_logic(GameState *game, int bot_index) {
     }
 
     int *valid_neutral_move_indexes = malloc(sizeof(int));
-    if (valid_neutral_move_indexes == NULL) {
-        fprintf(stderr, "Memory allocation for valid neutral moves failed");
+    if(valid_neutral_move_indexes == NULL) {
         return -2;
     }
     int valid_neutral_moves_count = 0;
 
     int *valid_attack_move_indexes = malloc(sizeof(int));
-    if (valid_attack_move_indexes == NULL) {
-        fprintf(stderr, "Memory allocation for valid attack moves failed");
+    if(valid_attack_move_indexes == NULL) {
         free(valid_neutral_move_indexes);
         return -3;
     }
     int valid_attack_moves_count = 0;
 
-
     for(int card_index = 0; card_index < bot->hand_card_count; card_index++) {
-        if(is_move_valid(bot->hand[card_index], top_card) && bot->hand[card_index].color != COLOR_WILD && bot->hand[card_index].card_type != CARD_DRAW_TWO
+        if(is_move_valid(bot->hand[card_index], top_card) && bot->hand[card_index].color != GAME_COLOR_WILD && bot->hand[card_index].card_type != CARD_DRAW_TWO
             && bot->hand[card_index].card_type != CARD_SKIP && bot->hand[card_index].card_type != CARD_REVERSE) {
             if(valid_neutral_moves_count == 0) {
                 valid_neutral_move_indexes[0] = card_index;
                 valid_neutral_moves_count++;
-            } else{
+            } else {
                 int *temp = realloc(valid_neutral_move_indexes, (valid_neutral_moves_count + 1) * sizeof(int));
-
                 if(temp == NULL) {
-                    fprintf(stderr, "Memory allocation for valid neutral moves failed");
                     free(valid_neutral_move_indexes);
                     free(valid_attack_move_indexes);
                     return -2;
                 }
-
                 valid_neutral_move_indexes = temp;
-
-
                 valid_neutral_move_indexes[valid_neutral_moves_count] = card_index;
                 valid_neutral_moves_count++;
             }
-        } else if (is_move_valid(bot->hand[card_index], top_card) && (bot->hand[card_index].color == COLOR_WILD || bot->hand[card_index].card_type == CARD_DRAW_TWO
-                    ||bot->hand[card_index].card_type == CARD_SKIP || bot->hand[card_index].card_type == CARD_REVERSE)) {
+        } else if(is_move_valid(bot->hand[card_index], top_card) && (bot->hand[card_index].color == GAME_COLOR_WILD || bot->hand[card_index].card_type == CARD_DRAW_TWO
+                    || bot->hand[card_index].card_type == CARD_SKIP || bot->hand[card_index].card_type == CARD_REVERSE)) {
             if(valid_attack_moves_count == 0) {
                 valid_attack_move_indexes[0] = card_index;
                 valid_attack_moves_count++;
             } else {
                 int *temp = realloc(valid_attack_move_indexes, (valid_attack_moves_count + 1) * sizeof(int));
-
                 if(temp == NULL) {
-                    fprintf(stderr, "Memory allocation for valid attack moves failed");
                     free(valid_neutral_move_indexes);
                     free(valid_attack_move_indexes);
                     return -3;
                 }
-
                 valid_attack_move_indexes = temp;
-
-
                 valid_attack_move_indexes[valid_attack_moves_count] = card_index;
                 valid_attack_moves_count++;
             }
@@ -188,30 +171,23 @@ static int bot_logic(GameState *game, int bot_index) {
         bot->bot_state = BOT_STATE_STANDARD;
     }
 
-
     int chosen_move = -1;
     switch(bot->bot_state) {
-
         case BOT_STATE_WIN_CHASE: {
-
             if(has_wild_card(game, bot_index)) {
-
                 int wild_card_index = -1;
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-                    if(bot->hand[valid_attack_move_indexes[i]].color == COLOR_WILD) {
+                    if(bot->hand[valid_attack_move_indexes[i]].color == GAME_COLOR_WILD) {
                         wild_card_index = valid_attack_move_indexes[i];
                     }
                 }
-
                 if(wild_card_index != -1) {
                     chosen_move = wild_card_index;
                     break;
                 }
-
-
             }
 
-            if (chosen_move != -1) break;
+            if(chosen_move != -1) break;
 
             for(int i = 0; i < valid_attack_moves_count; i++) {
                 if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE
@@ -221,44 +197,37 @@ static int bot_logic(GameState *game, int bot_index) {
                 }
             }
 
-            if (chosen_move != -1) break;
+            if(chosen_move != -1) break;
 
             if(valid_neutral_moves_count > 0) {
                 chosen_move = valid_neutral_move_indexes[0];
                 break;
             }
-
-
             break;
         }
 
         case BOT_STATE_AGGRESSIVE: {
-
             if(valid_attack_moves_count > 0) {
-
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD_DRAW_FOUR) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
                     }
                 }
 
-                if (chosen_move != -1) break;
+                if(chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
                     }
                 }
 
-                if (chosen_move != -1) break;
+                if(chosen_move != -1) break;
 
                 if(previous_player.hand_card_count > 2) {
                     for(int i = 0; i < valid_attack_moves_count; i++) {
-
                         if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE) {
                             chosen_move = valid_attack_move_indexes[i];
                             break;
@@ -266,53 +235,47 @@ static int bot_logic(GameState *game, int bot_index) {
                     }
                 }
 
-                if (chosen_move != -1) break;
+                if(chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
-                    if(bot->hand[valid_attack_move_indexes[i]].color == COLOR_WILD) {
+                    if(bot->hand[valid_attack_move_indexes[i]].color == GAME_COLOR_WILD) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
                     }
                 }
 
-                if (chosen_move != -1) break;
-
+                if(chosen_move != -1) break;
             }
 
             if(valid_neutral_moves_count > 0) {
                 chosen_move = valid_neutral_move_indexes[0];
                 break;
             }
-
             break;
         }
 
         case BOT_STATE_PANIC: {
             if(valid_attack_moves_count > 0) {
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD_DRAW_FOUR) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
                     }
                 }
 
-                if (chosen_move != -1) break;
+                if(chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
-                    if(bot->hand[valid_attack_move_indexes[i]].color == COLOR_WILD) {
+                    if(bot->hand[valid_attack_move_indexes[i]].color == GAME_COLOR_WILD) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
                     }
                 }
 
-                if (chosen_move != -1) break;
+                if(chosen_move != -1) break;
 
                 if(previous_player.hand_card_count > 2) {
                     for(int i = 0; i < valid_attack_moves_count; i++) {
-
                         if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE) {
                             chosen_move = valid_attack_move_indexes[i];
                             break;
@@ -321,18 +284,17 @@ static int bot_logic(GameState *game, int bot_index) {
                 }
             }
 
-            if (chosen_move != -1) break;
+            if(chosen_move != -1) break;
 
             if(valid_neutral_moves_count > 0) {
                 chosen_move = valid_neutral_move_indexes[0];
                 break;
             }
 
-            if (chosen_move != -1) break;
+            if(chosen_move != -1) break;
 
             if(valid_attack_moves_count > 0) {
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
@@ -348,11 +310,10 @@ static int bot_logic(GameState *game, int bot_index) {
                 break;
             }
 
-            if (chosen_move != -1) break;
+            if(chosen_move != -1) break;
 
             if(valid_attack_moves_count > 0) {
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_SKIP || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_DRAW_TWO
                         || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_REVERSE) {
                         chosen_move = valid_attack_move_indexes[i];
@@ -360,10 +321,9 @@ static int bot_logic(GameState *game, int bot_index) {
                     }
                 }
 
-                if (chosen_move != -1) break;
+                if(chosen_move != -1) break;
 
                 for(int i = 0; i < valid_attack_moves_count; i++) {
-
                     if(bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD || bot->hand[valid_attack_move_indexes[i]].card_type == CARD_WILD_DRAW_FOUR) {
                         chosen_move = valid_attack_move_indexes[i];
                         break;
